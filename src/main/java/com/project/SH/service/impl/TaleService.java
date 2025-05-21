@@ -55,21 +55,29 @@ public class TaleService {
                 .orElseThrow(() -> new RuntimeException("Казку не знайдено"));
 
         Set<User> likedUsers = tale.getLikedBy();
+        Set<Tale> likedTales = user.getLikedTales();
 
         boolean removed = false;
-        for (User u : new HashSet<>(likedUsers)) { // ← копія, безпечна для обходу
+        for (User u : new HashSet<>(likedUsers)) { // копия для безопасного обхода
             if (u.getId().equals(user.getId())) {
                 likedUsers.remove(u);
+                likedTales.remove(tale);      // обязательно удалить из множества пользователя
                 removed = true;
+                tale.setLikes(tale.getLikes() - 1);  // уменьшить счетчик лайков
                 break;
             }
         }
         if (!removed) {
             likedUsers.add(user);
+            likedTales.add(tale);              // добавить в множество пользователя
+            tale.setLikes(tale.getLikes() + 1);  // увеличить счетчик лайков
         }
 
+        // Сохраняем обе стороны, чтобы изменения попали в БД
+        userRepository.save(user);
         taleRepository.save(tale);
     }
+
     public boolean hasUserLikedTale(Long taleId, String username) {
         Tale tale = getTaleById(taleId);
         User user = userRepository.findByUsername(username)

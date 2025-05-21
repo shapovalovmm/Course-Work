@@ -3,15 +3,18 @@ package com.project.SH.model.impl;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "users")
+@EqualsAndHashCode(exclude = {"likedTales"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
