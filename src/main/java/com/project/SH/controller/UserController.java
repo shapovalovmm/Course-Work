@@ -1,11 +1,14 @@
 package com.project.SH.controller;
 
+import com.project.SH.model.impl.Tale;
 import com.project.SH.model.impl.User;
 import com.project.SH.service.impl.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:63342")
@@ -54,4 +57,7 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+
+
 }

@@ -15,17 +15,30 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @Entity
-@EqualsAndHashCode(exclude = {"likedBy"})
-    public class Tale {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
-        private String title;
-        private String author;
-        private String content;
-        private int likes;
+public class Tale {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @ManyToMany(mappedBy = "likedTales")
-        private Set<User> likedBy = new HashSet<>();
+    private String title;
+    private String author;
+    private String content;
+    private int likes;
 
+    @ManyToMany(mappedBy = "likedTales")
+    private Set<User> likedBy = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tale)) return false;
+        Tale tale = (Tale) o;
+        return id != null && id.equals(tale.getId());
     }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+}
+

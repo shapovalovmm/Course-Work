@@ -14,10 +14,11 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-@EqualsAndHashCode(exclude = {"likedTales"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String username;
@@ -33,5 +34,26 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "tale_id"))
     private Set<Tale> likedTales = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "user_favourite_tales",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tale_id"))
+    private Set<Tale> favouriteTales = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return id != null && id.equals(user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
 }
+
 

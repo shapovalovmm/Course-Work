@@ -5,6 +5,7 @@ import com.project.SH.model.impl.Tale;
 import com.project.SH.model.impl.User;
 import com.project.SH.repository.TaleRepository;
 import com.project.SH.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -51,6 +52,7 @@ public class TaleService {
 
     @Transactional
     public void toggleLike(Long taleId, User user) {
+
         Tale tale = taleRepository.findById(taleId)
                 .orElseThrow(() -> new RuntimeException("Казку не знайдено"));
 
@@ -77,6 +79,33 @@ public class TaleService {
         userRepository.save(user);
         taleRepository.save(tale);
     }
+    @Transactional
+    public void toggleFavourite(Long taleId, User user) {
+        System.out.println("=== TOGGLE FAVOURITE CALLED === Tale ID: " + taleId + ", User: " + user.getUsername());
+        Tale tale = taleRepository.findById(taleId)
+                .orElseThrow(() -> new RuntimeException("Казку не знайдено"));
+
+        // Убедитесь, что обе стороны в контексте persistence
+        // (или используйте метод merge)
+        if (user.getFavouriteTales().contains(tale)) {
+            user.getFavouriteTales().remove(tale);
+        } else {
+            user.getFavouriteTales().add(tale);
+        }
+        System.out.println("User " + user.getUsername() + " now has " + user.getFavouriteTales().size() + " favourites.");
+        // Необходимо сохранить обе стороны связи при необходимости
+        userRepository.save(user);
+    }
+
+
+    public boolean hasFavourited(Long taleId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Tale tale = taleRepository.findById(taleId)
+                .orElseThrow(() -> new EntityNotFoundException("Tale not found"));
+        return user.getFavouriteTales().contains(tale);
+    }
+
 
     public boolean hasUserLikedTale(Long taleId, String username) {
         Tale tale = getTaleById(taleId);

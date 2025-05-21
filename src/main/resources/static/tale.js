@@ -35,8 +35,7 @@ function setupInteractionFunctionality() {
     });
 
     // Обработчик клика по кнопке избранного
-    favoriteButton.addEventListener('click', function() {
-        // Проверяем авторизацию
+    favoriteButton.addEventListener('click', function () {
         if (!isUserAuthenticated()) {
             alert('Будь ласка, увійдіть, щоб додати казку до вибраного');
             return;
@@ -44,17 +43,19 @@ function setupInteractionFunctionality() {
 
         const isFavorited = favoriteButton.classList.contains('active');
 
+        // UI обновляем сразу (опционально можно обновлять после ответа от сервера)
         if (isFavorited) {
-            // Удаляем из избранного
             favoriteButton.classList.remove('active');
             favoriteButton.innerHTML = '<span class="icon">⭐</span> У вибране';
         } else {
-            // Добавляем в избранное
             favoriteButton.classList.add('active');
             favoriteButton.innerHTML = '<span class="icon">⭐</span> У вибраному';
         }
 
-        // Сохраняем предпочтение пользователя
+        // Отправляем запрос на сервер
+        toggleFavorite(taleId);
+
+        // Обновляем localStorage
         saveUserInteraction(taleId, 'favorite', !isFavorited);
     });
 }
@@ -101,7 +102,7 @@ function checkUserInteractions(taleId) {
         favoriteButton.classList.add('active');
         favoriteButton.innerHTML = '<span class="icon">⭐</span> У вибраному';
     }
-
+    checkFavoriteStatus(taleId);
     // Проверяем статус лайка с сервера и количество лайков
     checkLikeStatus(taleId);
 }
@@ -257,7 +258,36 @@ function getUserInteractions() {
     const interactions = localStorage.getItem('taleInteractions');
     return interactions ? JSON.parse(interactions) : { likes: [], favorites: [] };
 }
+async function toggleFavorite(taleId) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const favoriteButton = document.getElementById('favoriteButton');
 
+    if (!user || !user.token) {
+        alert('⚠️ Будь ласка, увійдіть в систему, щоб додати в обране');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8080/api/tales/${taleId}/favorite`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + user.token
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Не вдалося додати до вибраного');
+        }
+
+        // тут можно обработать результат, если сервер что-то возвращает
+        // const result = await response.json();
+
+    } catch (error) {
+        console.error('Помилка при додаванні в обране:', error);
+        alert('❌ Не вдалося змінити статус вибраного');
+    }
+}
 // Сохранение пользовательского взаимодействия в localStorage
 function saveUserInteraction(taleId, interactionType, value) {
     const interactions = getUserInteractions();
@@ -276,4 +306,36 @@ function saveUserInteraction(taleId, interactionType, value) {
 
     // Сохраняем в localStorage
     localStorage.setItem('taleInteractions', JSON.stringify(interactions));
+}
+function checkFavoriteStatus(taleId) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const favoriteButton = document.getElementById('favoriteButton');
+
+    if (!user || !user.token) {
+        return; // Не авторизован — ничего не делаем
+    }
+
+    fetch(`http://localhost:8080/api/tales/${taleId}/favorite/status`, {
+        headers: {
+            'Authorization': 'Bearer ' + user.token
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to check favorite status');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.isFavourite) {
+                favoriteButton.classList.add('active');
+                favoriteButton.innerHTML = '<span class="icon">⭐</span> У вибраному';
+            } else {
+                favoriteButton.classList.remove('active');
+                favoriteButton.innerHTML = '<span class="icon">⭐</span> У вибране';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking favorite status:', error);
+        });
 }

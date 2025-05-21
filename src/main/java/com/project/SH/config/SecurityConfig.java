@@ -33,20 +33,23 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(HttpMethod.OPTIONS, "/api/login").permitAll()
-//                        .requestMatchers("/api/login").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/tales/**").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/api/tales/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/tales/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/tales/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/tales/*/like").hasAnyRole("CONSUMER", "ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-//                        .requestMatchers("/api/users/**").hasRole("ADMIN")
-//                        .anyRequest().authenticated()
-//                )
+
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/api/login").permitAll()
+                        .requestMatchers("/api/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tales/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/tales").hasRole("ADMIN")   // POST только на /api/tales
+                        .requestMatchers(HttpMethod.PUT, "/api/tales/*").hasRole("ADMIN") // PUT на /api/tales/{id}
+                        .requestMatchers(HttpMethod.DELETE, "/api/tales/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/tales/*/like").hasAnyRole("CONSUMER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/tales/*/favorite").hasAnyRole("CONSUMER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/tales/*/like/status").hasAnyRole("CONSUMER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/tales/*/favorite/status").hasAnyRole("CONSUMER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
                 // Отключаем httpBasic, т.к. используем JWT
                 .httpBasic(AbstractHttpConfigurer::disable)
                 // Отключаем сессии — JWT статeless
