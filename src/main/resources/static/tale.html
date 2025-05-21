@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Казка</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tale-interactions {
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .interaction-btn {
+            background-color: #d26f1e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s;
+        }
+
+        .interaction-btn:hover {
+            background-color: #a94e00;
+        }
+
+        .interaction-btn.active {
+            background-color: #7b3f00;
+        }
+
+        .icon {
+            font-size: 18px;
+        }
+
+        .like-counter {
+            padding: 10px 15px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            color: #7b3f00;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .tale-interactions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+    <script src="tale.js" defer></script>
+</head>
+<body>
+<div class="main-content">
+    <div class="catalog">
+        <h1 id="taleTitle">Завантаження...</h1>
+        <p id="taleAuthor"></p>
+        <p id="taleContent"></p>
+
+        <!-- Добавляем блок для кнопок лайка и избранного -->
+        <div class="tale-interactions">
+            <button id="likeButton" class="interaction-btn like-btn">
+                <span class="icon">❤️</span> Подобається
+            </button>
+            <button id="favoriteButton" class="interaction-btn favorite-btn">
+                <span class="icon">⭐</span> У вибране
+            </button>
+            <div id="likeCounter" class="like-counter">0 уподобань</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

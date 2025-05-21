@@ -1,0 +1,157 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #e8d4ae;
+}
+
+header {
+    background-color: #d26f1e;
+    color: #e8d4ae;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+}
+
+.catalog {
+    max-width: 1000px;
+    width: 100%;
+}
+
+h1 {
+    color: #a94e00;
+    font-size: 32px;
+    margin-bottom: 5px;
+}
+
+.description {
+    color: #7b3f00;
+    margin-bottom: 30px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.item {
+    text-align: center;
+}
+
+.thumbnail {
+    width: 100%;
+    height: 120px;
+    background-color: #909266;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.title {
+    color: #a94e00;
+    font-size: 14px;
+}
+
+.auth-container {
+    max-width: 400px;
+    margin: 80px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.auth-container h2 {
+    text-align: center;
+    color: #a94e00;
+}
+
+.auth-container input, .auth-container button {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.auth-container button {
+    background-color: #d26f1e;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.auth-container p {
+    text-align: center;
+    margin-top: 20px;
+}
+.account {
+    display: flex;
+    align-items: center;
+}
+
+.account a {
+    margin-right: 15px;
+}
+
+.logout-btn {
+    background-color: transparent;
+    border: 1px solid #e8d4ae;
+    color: #e8d4ae;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: none; /* По умолчанию скрыт */
+}
+
+.logout-btn:hover {
+    background-color: #e8d4ae;
+    color: #d26f1e;
+}
+
+/* Стили для кнопки на карточках */
+.item button {
+    background-color: #d26f1e;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.item button:hover {
+    background-color: #a94e00;
+}
+
+#createTaleBtn {
+    background-color: #d26f1e;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#createTaleBtn:hover {
+    background-color: #a94e00;
+}
+
+#createTaleBtn:active {
+    transform: scale(0.98);
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Редагувати казку</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .edit-container {
+      max-width: 700px;
+      margin: 80px auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .edit-container h1 {
+      text-align: center;
+      color: #a94e00;
+      margin-bottom: 30px;
+    }
+
+    .edit-container label {
+      display: block;
+      margin-bottom: 15px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .edit-container input,
+    .edit-container textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      margin-top: 5px;
+      font-family: inherit;
+    }
+
+    .edit-container button {
+      background-color: #d26f1e;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .edit-container button:hover {
+      background-color: #a94e00;
+    }
+  </style>
+</head>
+<body>
+<div class="edit-container">
+  <h1>Редагувати казку</h1>
+  <form id="editForm">
+    <label>
+      Назва:
+      <input type="text" id="title" required>
+    </label>
+    <label>
+      Автор:
+      <input type="text" id="author" required>
+    </label>
+    <label>
+      Контент:
+      <textarea id="content" rows="10" required></textarea>
+    </label>
+    <button type="submit">Оновити</button>
+  </form>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const taleId = urlParams.get('id');
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const token = userData?.token;
+
+  async function loadTale() {
+    const response = await fetch(`http://127.0.0.1:8080/api/tales/${taleId}`);
+    if (!response.ok) return alert('Не вдалося завантажити казку');
+
+    const tale = await response.json();
+    document.getElementById('title').value = tale.title;
+    document.getElementById('author').value = tale.author;
+    document.getElementById('content').value = tale.content;
+  }
+
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const tale = {
+      title: document.getElementById('title').value,
+      author: document.getElementById('author').value,
+      content: document.getElementById('content').value
+    };
+
+    const response = await fetch(`http://127.0.0.1:8080/api/tales/${taleId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(tale)
+    });
+
+    if (response.ok) {
+      alert('Казку оновлено!');
+      window.location.href = 'index.html';
+    } else {
+      const msg = await response.text();
+      alert(`Помилка: ${response.status}\n${msg}`);
+    }
+  });
+
+  loadTale();
+</script>
+</body>
+</html>

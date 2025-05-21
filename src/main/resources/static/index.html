@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Story Hollow</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+</head>
+<body>
+<header>
+    <div class="logo">The Story Hollow</div>
+    <div class="account">
+        <a href="login.html" id="loginLink" style="color: inherit; text-decoration: none;">Обліковий запис</a>
+        <button id="logoutBtn" class="logout-btn">Вийти</button>
+    </div>
+</header>
+
+<div class="main-content">
+    <div class="catalog">
+        <h1>Вітаємо!</h1>
+        <p class="description">Ми – сайт-каталог, де ви зможете знайти казки на ніч для своєї дитини</p>
+        <button id="createTaleBtn" style="display: none;">Створити казку</button>
+        <div class="grid" id="taleGrid">
+            <!-- Казки будуть додані тут динамічно -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Добавляем функцию для выхода из аккаунта
+    document.addEventListener('DOMContentLoaded', () => {
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginLink = document.getElementById('loginLink');
+
+        // Проверяем, авторизован ли пользователь
+        const userData = localStorage.getItem('user');
+
+        if (userData) {
+            // Если пользователь авторизован, показываем кнопку выхода и меняем текст ссылки
+            logoutBtn.style.display = 'block';
+            loginLink.textContent = 'Мій профіль';
+        }
+
+        // Обработчик клика по кнопке выхода
+        logoutBtn.addEventListener('click', () => {
+            // Удаляем данные пользователя
+            localStorage.removeItem('user');
+            // Обновляем страницу
+            window.location.reload();
+        });
+    });
+</script>
+</body>
+</html>

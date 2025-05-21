@@ -2,32 +2,33 @@ package com.project.SH.model.impl;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.project.SH.model.IUser;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "user_type"
-)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = Admin.class, name = "ADMIN"),
-        @JsonSubTypes.Type(value = Consumer.class, name = "CONSUMER"),
-        @JsonSubTypes.Type(value = Guest.class, name = "GUEST")
-})
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "user_type")
-@Table(name = "Users")
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Data
-// ОБЛІКОВИЙ ЗАПИС ГОСТЯ
-public abstract class User implements IUser {
+@Entity
+@Table(name = "users")
+public class User {
     @Id
-    @GeneratedValue
-    long userID;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String username;
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    private Set<String> roles = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "user_likes_tale",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tale_id"))
+    private Set<Tale> likedTales = new HashSet<>();
 }
+

@@ -1,7 +1,6 @@
 package com.project.SH.model.impl;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.project.SH.model.IConsumer;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,7 +11,7 @@ import java.util.List;
 @DiscriminatorValue("CONSUMER")
 @JsonTypeName("CONSUMER")
 // ОБЛІКОВИЙ ЗАПИС ЗАРЕЄСТРОВАНОГО КОРИСТУВАЧА
-public class Consumer  extends User implements IConsumer{
+public class Consumer  extends User {
     @OneToMany
     @JoinTable(
             name = "user_favorites",

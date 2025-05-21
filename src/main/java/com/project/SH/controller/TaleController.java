@@ -1,46 +1,116 @@
 package com.project.SH.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.project.SH.dto.TaleDto;
 import com.project.SH.model.impl.Tale;
+import com.project.SH.model.impl.User;
+import com.project.SH.repository.TaleRepository;
+import com.project.SH.repository.UserRepository;
 import com.project.SH.service.impl.TaleService;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @RestController
-@RequestMapping("/api/v1/Tales")
-
+@CrossOrigin(origins = "http://localhost:63342")
+@RequestMapping("/api/tales")
 public class TaleController {
 
-    private final TaleService service;
+    @Autowired
+    private TaleService taleService;
 
-    public TaleController(TaleService service) {
-        this.service = service;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping
-    public List<Tale> findAllTale(){
-        return service.findAllTales();
+    public ResponseEntity<List<TaleDto>> getAllTales() {
+        List<Tale> tales = taleService.getAllTales();
+        List<TaleDto> dtos = tales.stream()
+                .map(taleService::mapToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
-    @PostMapping("/save_Tale")
-    public Tale saveTale(@RequestBody Tale tale) {
-        return service.saveTale(tale);
+    @GetMapping("/{id}")
+    public ResponseEntity<TaleDto> getTaleById(@PathVariable Long id) {
+        Tale tale = taleService.getTaleById(id);
+        if (tale == null) {
+            return ResponseEntity.notFound().build();
+        }
+        TaleDto dto = taleService.mapToDto(tale);
+        return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{taleID}")
-    public Tale findByID(@PathVariable int taleID) {
-        return service.findByID(taleID);
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TaleDto> createTale(@RequestBody Tale tale) {
+        Tale saved = taleService.saveTale(tale);
+        return ResponseEntity.ok(taleService.mapToDto(saved));
     }
 
-    @PutMapping("update_Tale")
-    public Tale updateTale(@RequestBody Tale tale) {
-        return service.updateTale(tale);
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TaleDto> updateTale(@PathVariable Long id, @RequestBody Tale tale) {
+        Tale updated = taleService.updateTale(id, tale);
+        if (updated == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(taleService.mapToDto(updated));
     }
 
-    @DeleteMapping("delete_Tale/{taleID}")
-    public void deleteTale(int taleID) {
-        service.deleteTale(taleID);
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteTale(@PathVariable Long id) {
+        taleService.deleteTale(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/like")
+    @PreAuthorize("hasRole('CONSUMER') or hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> likeOrUnlikeTale(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        taleService.toggleLike(id, user);
+        Tale updatedTale = taleService.getTaleById(id);
+        int updatedLikes = updatedTale != null ? updatedTale.getLikes() : 0;
+
+        boolean hasLiked = taleService.hasUserLikedTale(id, userDetails.getUsername());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likes", updatedLikes);
+        response.put("hasLiked", hasLiked);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/like/status")
+    @PreAuthorize("hasRole('CONSUMER') or hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> checkLikeStatus(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        boolean hasLiked = taleService.hasUserLikedTale(id, userDetails.getUsername());
+        Tale tale = taleService.getTaleById(id);
+        int likes = tale != null ? tale.getLikes() : 0;
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("hasLiked", hasLiked);
+        response.put("likes", likes);
+
+        return ResponseEntity.ok(response);
     }
 }
-
